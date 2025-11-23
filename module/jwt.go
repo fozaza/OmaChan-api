@@ -4,7 +4,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/OmaChan/database/table"
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -32,11 +31,17 @@ func Cr_jwt(email string, level int) (string, error) {
 }
 
 // userContextKey is the key used to store user data in the fiber context
+// UserReturn for jwt
+type UserReturn struct {
+	Email string
+	Level int
+}
+
 const userContextKey = "user"
 
 func ExtractUserFromJWT(app *fiber.App) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		user := &table.UserReturn{}
+		user := &UserReturn{}
 
 		// Extract the token from the Fiber context (inserted by the JWT middleware)
 		token := c.Locals("user").(*jwt.Token)
@@ -54,7 +59,7 @@ func ExtractUserFromJWT(app *fiber.App) fiber.Handler {
 
 func Req_level(level int) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		user, ok := c.Locals(userContextKey).(*table.UserReturn)
+		user, ok := c.Locals(userContextKey).(*UserReturn)
 		if !ok || user == nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "OmaChan >>> you dont have jwt"})
 		}
