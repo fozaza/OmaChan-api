@@ -1,6 +1,9 @@
 package table
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/OmaChan/database"
 	"github.com/OmaChan/module"
 	"gorm.io/gorm"
@@ -28,16 +31,28 @@ type UserLogin struct {
 }
 
 type UserRetrun struct {
-	Email      string
-	Level_user int
+	Email string
+	Level int
 }
 
 // func Create user
 func Cr_user(user UserInput) module.ErrorOmaChan {
 	var new_user User
-	new_user.Email = user.Email
-	new_user.Name = user.Name
+	name := string(user.Name)
+	strings.ToLower(name)
+	strings.TrimSpace(name)
+
+	email := user.Email
+	strings.ToLower(email)
+	strings.TrimSpace(email)
+
+	new_user.Email = email
+	new_user.Name = name
 	new_user.Level = 1
+
+	if new_user.Name == "root" {
+		return module.New_ErrorOmChan().Errors("OmaChan >>> u can't use root")
+	}
 
 	password, err := module.Cr_pw(user.Password)
 	if err.Err != nil {
@@ -64,6 +79,28 @@ func Login(user_input UserLogin) (UserRetrun, error) {
 		return user_login, nil
 	}
 	user_login.Email = user.Email
-	user_login.Level_user = user.Level
+	user_login.Level = user.Level
 	return user_login, nil
+}
+
+// Chage level
+func Ch_le(admin UserRetrun, email string, new_level int) error {
+	if new_level > 4 && new_level < 1 {
+		return errors.New("OmaChan >>> u can't add new level >4 and <1")
+	}
+
+	var user User
+	db := database.Get_db()
+	result := db.Debug().Where("email=?", email).First(&user)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if user.Name == "root" {
+		return errors.New("OmaChan >>> error u can't change root")
+	}
+	user.Level = new_level
+	db.Save(&user)
+
+	return nil
 }

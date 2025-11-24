@@ -57,6 +57,11 @@ func ExtractUserFromJWT(app *fiber.App) fiber.Handler {
 	}
 }
 
+func Get_token(c *fiber.Ctx) (string, int) {
+	user := c.Locals(userContextKey).(*UserReturn)
+	return user.Email, user.Level
+}
+
 func Req_level(level int) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user, ok := c.Locals(userContextKey).(*UserReturn)

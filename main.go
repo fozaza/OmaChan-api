@@ -18,6 +18,7 @@ func main() {
 		panic(err.Error())
 	}
 	install.Install_table()
+	install.Install_root()
 	jp2a.Print("~/Documents/golang/OmaChan/module/jp2a/image/Dragon_Comic.jpg")
 	server.OpenServer()
 }

@@ -10,7 +10,8 @@ func create_user(c *fiber.Ctx) error {
 	// read input from json
 	var user_input table.UserInput
 	if err := c.BodyParser(&user_input); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("OmaChan >>> BadRequest plz input name email and password")
+		return c.Status(fiber.StatusBadRequest).
+			SendString("OmaChan >>> BadRequest plz input name email and password")
 	}
 
 	// create to database
@@ -35,7 +36,7 @@ func login_user(c *fiber.Ctx) error {
 			SendString("OmaChan >>> Error to login")
 	}
 
-	t, err := module.Cr_jwt(user.Email, user.Level_user)
+	t, err := module.Cr_jwt(user.Email, user.Level)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).
 			SendString(err.Error())
@@ -46,7 +47,27 @@ func login_user(c *fiber.Ctx) error {
 	})
 }
 
+func change_level(c *fiber.Ctx) error {
+	// read input json
+	var req table.UserRetrun
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			SendString("OmaChan >>> BadRequest plz input email and password")
+	}
+
+	// Get email req and user
+	var admin table.UserRetrun
+	admin.Email, admin.Level = module.Get_token(c)
+
+	if result := table.Ch_le(admin, req.Email, req.Level); result != nil {
+		return c.Status(fiber.StatusBadRequest).
+			SendString(result.Error())
+	}
+	return c.SendString("OmaChan >>> update level user success")
+}
+
 func Get_all_router(r fiber.Router) {
 	r.Post("/login", login_user)
 	r.Post("/Create", create_user)
+	r.Post("/admin/changeLevel", change_level)
 }
