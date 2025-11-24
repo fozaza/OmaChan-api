@@ -24,6 +24,7 @@ func Open(path string) error {
 	fmt.Println("Open Success")
 	return nil
 }
+
 func Get_db() *gorm.DB {
 	if database == nil {
 		panic("DataBase is Unsafe, Error db is nill")

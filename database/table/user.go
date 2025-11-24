@@ -104,3 +104,51 @@ func Ch_le(admin UserRetrun, email string, new_level int) error {
 
 	return nil
 }
+
+// Remove user (self)
+func Rm_self(user_login UserLogin) error {
+	var user UserLogin
+	db := database.Get_db()
+	result := db.Debug().Where("email=?", user_login.Email).First(&user)
+	if result.Error != nil {
+		return errors.New("OmaChan >>> not found email")
+	}
+
+	// check user
+	if err := module.Ch_pw(user_login.Password, user.Password); err != nil {
+		return err
+	}
+
+	result = db.Debug().Delete(user)
+	if result.Error != nil {
+		return errors.New("OmaChan >>> error delete id")
+	}
+	return nil
+}
+
+// Remove with admin or root
+func Rm_user(id_admin UserLogin, user_email []string) (string, error) {
+	// get admin or root id with email
+	var admin UserLogin
+	db := database.Get_db()
+	result := db.Where(id_admin.Email).First(&admin)
+	if result.Error != nil {
+		return "", errors.New("OmaChan >>> not found email")
+	}
+	// admin or root password
+	if err := module.Ch_pw(id_admin.Password, admin.Password); err != nil {
+		return "", err
+	}
+
+	// delete user all with email
+	var processs string // for msg loop delete user
+	for _, email := range user_email {
+		result = db.Debug().Where("email=?", email).Delete(&User{})
+		if result.Error != nil {
+			processs = email + ": Error\n"
+			continue
+		}
+		processs = email + ": Success\n"
+	}
+	return processs, nil
+}
