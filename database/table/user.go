@@ -2,6 +2,7 @@ package table
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/OmaChan/database"
@@ -16,6 +17,15 @@ type User struct {
 	Email    string `gorm:"uniqueIndex"`
 	Password string
 	Level    int
+}
+
+func (user User) To_retrun() UserGetRetrun {
+	var user_retrun = UserGetRetrun{
+		Name:  user.Name,
+		Email: user.Email,
+		Level: user.Level,
+	}
+	return user_retrun
 }
 
 // UserInput for login
@@ -34,6 +44,50 @@ type UserRetrun struct {
 	Email string
 	Level int
 }
+
+type UserGetRetrun struct {
+	Name  string
+	Email string
+	Level int
+}
+
+func Map_user(user []User) []UserGetRetrun {
+	user_new := []UserGetRetrun{}
+	for _, u := range user {
+		user_new = append(user_new, u.To_retrun())
+	}
+	return user_new
+}
+
+// user for query user. user req name,email
+type QueryUser struct {
+	Email       string
+	Name        string
+	StartIntdex uint
+	MaxOuput    uint
+}
+
+func (query QueryUser) DataMapQuery() string {
+	var email = "email="
+	if query.Email == "" {
+		email = ""
+	}
+
+	var name = "name="
+	if query.Name == "" {
+		name = ""
+	}
+
+	return_query := fmt.Sprintf("%s %s %s %s", email, query.Email, name, query.Name)
+	return return_query
+}
+
+type RemoveUserWithAdmin struct {
+	Email []string
+	Admin UserLogin
+}
+
+type Password string
 
 // func Create user
 func Cr_user(user UserInput) module.ErrorOmaChan {
@@ -109,7 +163,7 @@ func Ch_le(admin UserRetrun, email string, new_level int) error {
 func Rm_self(user_login UserLogin) error {
 	var user UserLogin
 	db := database.Get_db()
-	result := db.Debug().Where("email=?", user_login.Email).First(&user)
+	result := db.Debug().Where("emailอีเมล=?", user_login.Email).First(&user)
 	if result.Error != nil {
 		return errors.New("OmaChan >>> not found email")
 	}
@@ -151,4 +205,35 @@ func Rm_user(id_admin UserLogin, user_email []string) (string, error) {
 		processs = email + ": Success\n"
 	}
 	return processs, nil
+}
+
+// get user with email name
+func Gt_user(query QueryUser) (UserGetRetrun, error) {
+	var user User
+	db := database.Get_db()
+
+	// map query
+	var str_query = query.DataMapQuery()
+	if result := db.Debug().Where(str_query).First(&user); result.Error != nil {
+		return user.To_retrun(), result.Error
+	}
+
+	return user.To_retrun(), nil
+}
+
+// get user all with
+func Gt_all_user(query QueryUser) ([]UserGetRetrun, error) {
+	var user []User
+	db := database.Get_db()
+
+	var str_query = query.DataMapQuery()
+	if result := db.Debug().
+		Limit(int(query.MaxOuput)).
+		Offset(int(query.StartIntdex)).
+		Where(str_query).
+		Find(&user); result.Error != nil {
+		return Map_user(user), result.Error
+	}
+
+	return Map_user(user), nil
 }

@@ -47,6 +47,33 @@ func login_user(c *fiber.Ctx) error {
 	})
 }
 
+func get_user(c *fiber.Ctx) error {
+	return c.SendString("")
+}
+
+func rm_self(c *fiber.Ctx) error {
+	// read rm yes_no
+	var password table.Password
+
+	if err := c.BodyParser(&password); err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			SendString("OmaChan >>> BadRequest plz input email and password")
+	}
+
+	email, _ := module.Get_token(c)
+	user := table.UserLogin{
+		Email:    email,
+		Password: string(password),
+	}
+
+	err := table.Rm_self(user)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).
+			SendString(err.Error())
+	}
+	return c.SendString("OmaChan >> remove account success")
+}
+
 func change_level(c *fiber.Ctx) error {
 	// read input json
 	var req table.UserRetrun
@@ -66,8 +93,30 @@ func change_level(c *fiber.Ctx) error {
 	return c.SendString("OmaChan >>> update level user success")
 }
 
+func remove_user(c *fiber.Ctx) error {
+	// read josn
+	var req table.RemoveUserWithAdmin
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			SendString("OmaChan >>> BadRequest plz input email and password")
+	}
+
+	result, err := table.Rm_user(req.Admin, req.Email)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			SendString(err.Error())
+	}
+	return c.JSON(fiber.Map{
+		"Massage": "OmaChan remove user list",
+		"Log":     result,
+	})
+}
+
 func Get_all_router(r fiber.Router) {
 	r.Post("/login", login_user)
-	r.Post("/Create", create_user)
+	r.Post("/create", create_user)
+	r.Post("/remove", rm_self)
+
 	r.Post("/admin/changeLevel", change_level)
+	r.Post("/admin/removeUser", remove_user)
 }
