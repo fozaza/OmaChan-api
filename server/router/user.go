@@ -48,7 +48,39 @@ func login_user(c *fiber.Ctx) error {
 }
 
 func get_user(c *fiber.Ctx) error {
-	return c.SendString("")
+	var req table.QueryUser
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			SendString("OmaChan >>> BadRequest plz input email and password")
+	}
+
+	user, err := table.Gt_user(req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			SendString(err.Error())
+	}
+	return c.JSON(fiber.Map{
+		"Msg":  "Req ok",
+		"User": user,
+	})
+}
+
+func get_user_all(c *fiber.Ctx) error {
+	var req table.QueryUser
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			SendString("OmaChan >>> BadRequest plz input email and password")
+	}
+
+	user_all, err := table.Gt_all_user(req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			SendString(err.Error())
+	}
+	return c.JSON(fiber.Map{
+		"Msg":  "Req Ok",
+		"User": user_all,
+	})
 }
 
 func rm_self(c *fiber.Ctx) error {
@@ -116,6 +148,8 @@ func Get_all_router(r fiber.Router) {
 	r.Post("/login", login_user)
 	r.Post("/create", create_user)
 	r.Post("/remove", rm_self)
+	r.Post("/User", get_user)
+	r.Post("/AllUser", get_user_all)
 
 	r.Post("/admin/changeLevel", change_level)
 	r.Post("/admin/removeUser", remove_user)
