@@ -163,7 +163,7 @@ func Ch_le(admin UserRetrun, email string, new_level int) error {
 func Rm_self(user_login UserLogin) error {
 	var user UserLogin
 	db := database.Get_db()
-	result := db.Debug().Where("emailอีเมล=?", user_login.Email).First(&user)
+	result := db.Debug().Where("email=?", user_login.Email).First(&user)
 	if result.Error != nil {
 		return errors.New("OmaChan >>> not found email")
 	}

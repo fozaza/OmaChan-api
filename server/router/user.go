@@ -150,7 +150,9 @@ func Get_all_router(r fiber.Router) {
 	r.Post("/remove", rm_self)
 	r.Post("/User", get_user)
 	r.Post("/AllUser", get_user_all)
+	r.Post("/Gt_hwd", gt_hwd)
 
 	r.Post("/admin/changeLevel", change_level)
 	r.Post("/admin/removeUser", remove_user)
+	r.Post("/admin/createHwd", acr_hw)
 }
