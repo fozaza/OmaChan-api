@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"github.com/OmaChan/module"
+	//"github.com/OmaChan/module"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -11,10 +11,11 @@ var database *gorm.DB
 
 func Open(path string) error {
 	fmt.Println("Open Server")
-	file, err := module.Get_file_path(path)
-	if err != nil {
-		return err
-	}
+	file := path
+	//module.Get_file_path(path)
+	// if err != nil {
+	// 	return err
+	// }
 
 	db, err := gorm.Open(sqlite.Open(file), &gorm.Config{})
 	if err != nil {

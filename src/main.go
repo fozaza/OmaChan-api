@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		panic(err.Error())
+		//panic(err.Error())
 	}
 	if err := database.Open(os.Getenv("db_path")); err != nil {
 		panic(err.Error())
 	}
 	install.Install_table()
 	install.Install_root()
-	jp2a.Print("~/Documents/golang/OmaChan/module/jp2a/image/Dragon_Comic.jpg")
+	jp2a.Print(os.Getenv("image"))
 	server.OpenServer()
 }

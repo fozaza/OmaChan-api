@@ -4,15 +4,14 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
-
-	"github.com/OmaChan/module"
 )
 
 func Print(image_path string) {
-	path, err := module.Get_file_path(image_path)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	path := image_path
+	// path, err := module.Get_file_path(image_path)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
 	cmd := exec.Command("jp2a", "--color", "--width=80", path)
 
 	output, err := cmd.Output()
