@@ -25,7 +25,8 @@ ENV image="/etc/src/app/OmaChan/module/jp2a/image/Dragon_Comic.jpg"
 ENV PATH="/usr/local/go/bin:${PATH}"
 ENV GOPATH="/go"
 ENV PATH="${GOPATH}/bin:${PATH}"
-
+ENV EMAIL = "test@email.com"
+ENV PASSWORD = "12345678"
 
 WORKDIR /go
 RUN go version

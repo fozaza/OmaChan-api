@@ -20,5 +20,6 @@ func main() {
 	install.Install_table()
 	install.Install_root()
 	jp2a.Print(os.Getenv("image"))
+	println("Test")
 	server.OpenServer()
 }

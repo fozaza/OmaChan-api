@@ -5,9 +5,9 @@ services:
     image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_DB: mydatabase
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: oma_chan_data
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: qqee22rr43
     volumes:
       - postgres_data:/var/lib/postgresql
     ports:
@@ -27,7 +27,7 @@ services:
     restart: unless-stopped
 
   debian_test:
-    image: debian_test:latest
+    image: omachan-image
     build: .
     ports:
       - "3000:3000"

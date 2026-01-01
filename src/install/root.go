@@ -2,6 +2,7 @@ package install
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/OmaChan/database"
 	"github.com/OmaChan/database/table"
@@ -18,12 +19,21 @@ func Install_root() {
 	}
 
 	// input data
-	var password string
-	var email string
-	fmt.Print("OmaChan >>> Create root input password: ")
-	fmt.Scanln(&password)
-	fmt.Print("OmaChan >>> Create root input email: ")
-	fmt.Scanln(&email)
+	// var password string
+	// var email string
+	// fmt.Print("OmaChan >>> Create root input password: ")
+	// fmt.Scanln(&password)
+	// fmt.Print("OmaChan >>> Create root input email: ")
+	// fmt.Scanln(&email)
+	password := os.Getenv("PASSWORD")
+	if password == "" {
+		panic("Error not found env password")
+	}
+
+	email := os.Getenv("EMAIL")
+	if email == "" {
+		panic("Error not found env email")
+	}
 
 	// Create root
 	// Gen password
