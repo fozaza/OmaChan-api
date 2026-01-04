@@ -7,8 +7,6 @@ WORKDIR /etc/src/app
 RUN apt update -y 
 RUN apt install jp2a wget sqlite3 gcc -y
 
-
-
 # install golang version 1.25.4
 RUN wget -c https://go.dev/dl/go1.25.4.linux-amd64.tar.gz 
 RUN  tar -C /usr/local/ -xzf go1.25.4.linux-amd64.tar.gz 
@@ -27,6 +25,7 @@ ENV GOPATH="/go"
 ENV PATH="${GOPATH}/bin:${PATH}"
 ENV EMAIL = "test@email.com"
 ENV PASSWORD = "12345678"
+ENV OPEN_WITH_DOCKER = "true"
 
 WORKDIR /go
 RUN go version
@@ -40,9 +39,19 @@ COPY src ./OmaChan
 WORKDIR /etc/src/app/OmaChan
 
 #RUN echo ${db_path}
-RUN touch test.db
+#RUN touch test.db
 #RUN CGO_ENABLED=1 GOOS=linux go run main.go
+# RUN go build .
+# RUN rm -rf /etc/src/app/OmaChan/src/table  
+# RUN rm -rf /etc/src/app/OmaChan/src/install 
+# RUN rm -rf /etc/src/app/OmaChan/src/server 
+# RUN rm -rf /etc/src/app/OmaChan/src/database
+
+RUN rm -f /etc/src/app/OmaChan/src/go.mod \
+  /etc/src/app/OmaChan/src/go.sum \
+  /etc/src/app/OmaChan/src/main.go
 
 # export port
 EXPOSE 3000
 CMD [ "go","run","main.go" ]
+#CMD ["./OmaChan"]

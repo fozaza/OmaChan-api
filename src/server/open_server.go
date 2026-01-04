@@ -34,7 +34,7 @@ func OpenServer() {
 	admin := app.Group("/admin")
 	admin.Use(module.Req_level(4))
 	admin.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello u r user")
+		return c.SendString("Hello u r admin")
 	})
 
 	app.Listen("0.0.0.0:3000")

@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"os"
 	//"github.com/OmaChan/module"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -16,8 +17,17 @@ func Open(path string) error {
 	// if err != nil {
 	// 	return err
 	// }
-	//
-	dsn := "host=localhost user=root password=qqee22rr43 dbname=oma_chan_data port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+
+	hostLocal := "host="
+	env := os.Getenv("OPEN_WITH_DOCKER")
+	if env == "" {
+		hostLocal += "localhost"
+	} else {
+		hostLocal += "postgres"
+	}
+
+	dsn := hostLocal + " user=root password=qqee22rr43 dbname=oma_chan_data port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	println(dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return err

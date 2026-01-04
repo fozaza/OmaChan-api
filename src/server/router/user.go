@@ -1,6 +1,8 @@
 package router
 
 import (
+	"strconv"
+
 	"github.com/OmaChan/database/table"
 	"github.com/OmaChan/module"
 	"github.com/gofiber/fiber/v2"
@@ -85,20 +87,20 @@ func get_user_all(c *fiber.Ctx) error {
 
 func rm_self(c *fiber.Ctx) error {
 	// read rm yes_no
-	var password table.Password
+	var userRemove table.UserLogin
 
-	if err := c.BodyParser(&password); err != nil {
+	if err := c.BodyParser(&userRemove); err != nil {
 		return c.Status(fiber.StatusBadRequest).
 			SendString("OmaChan >>> BadRequest plz input email and password")
 	}
 
-	email, _ := module.Get_token(c)
-	user := table.UserLogin{
-		Email:    email,
-		Password: string(password),
-	}
+	// email, _ := module.Get_token(c)
+	// user := table.UserLogin{
+	// 	Email:    email,
+	// 	Password: string(password),
+	// }
 
-	err := table.Rm_self(user)
+	err := table.Rm_self(userRemove)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).
 			SendString(err.Error())
@@ -108,21 +110,37 @@ func rm_self(c *fiber.Ctx) error {
 
 func change_level(c *fiber.Ctx) error {
 	// read input json
-	var req table.UserRetrun
+
+	type PreUserRetrun struct {
+		Email string
+		Level string
+	}
+	var req PreUserRetrun
+
 	if err := c.BodyParser(&req); err != nil {
+		println(err.Error())
 		return c.Status(fiber.StatusBadRequest).
-			SendString("OmaChan >>> BadRequest plz input email and password")
+			SendString("OmaChan >>> BadRequest plz input email and new level")
 	}
 
 	// Get email req and user
-	var admin table.UserRetrun
-	admin.Email, admin.Level = module.Get_token(c)
+	pre_admin, err := module.Get_token(c)
+	if err != nil {
+		return err
+	}
 
-	if result := table.Ch_le(admin, req.Email, req.Level); result != nil {
+	admin := table.UserRetrun{
+		Email: pre_admin.Email,
+		Level: pre_admin.Level,
+	}
+
+	userLevel, _ := strconv.ParseInt(req.Level, 10, 32)
+	if result := table.Ch_le(admin, req.Email, int(userLevel)); result != nil {
 		return c.Status(fiber.StatusBadRequest).
 			SendString(result.Error())
 	}
-	return c.SendString("OmaChan >>> update level user success")
+	return c.Status(fiber.StatusOK).
+		SendString("OmaChan >>> update level user success")
 }
 
 func remove_user(c *fiber.Ctx) error {
@@ -130,7 +148,7 @@ func remove_user(c *fiber.Ctx) error {
 	var req table.RemoveUserWithAdmin
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).
-			SendString("OmaChan >>> BadRequest plz input email and password")
+			SendString("OmaChan >>> BadRequest plz input email and input your email and password")
 	}
 
 	result, err := table.Rm_user(req.Admin, req.Email)
@@ -145,14 +163,16 @@ func remove_user(c *fiber.Ctx) error {
 }
 
 func Get_all_router(r fiber.Router) {
-	r.Post("/login", login_user)
-	r.Post("/create", create_user)
-	r.Post("/remove", rm_self)
-	r.Post("/User", get_user)
-	r.Post("/AllUser", get_user_all)
-	r.Post("/Gt_hwd", gt_hwd)
+	r.Post("/login", login_user)     // Ok
+	r.Post("/create", create_user)   // Ok // found bug if in database see user but can create new user?
+	r.Post("/remove", rm_self)       // Ok
+	r.Post("/User", get_user)        // no test
+	r.Post("/AllUser", get_user_all) // no test
+	r.Post("/Gt_hwd", gt_hwd)        // no test
+	r.Post("/hwdUp", up_hw)          // ok
 
-	r.Post("/admin/changeLevel", change_level)
-	r.Post("/admin/removeUser", remove_user)
-	r.Post("/admin/createHwd", acr_hw)
+	r.Post("/admin/changeLevel", change_level) // Ok //found bug if can more level 5
+	r.Post("/admin/removeUser", remove_user)   // ok //found bug not check email if email is root?
+	r.Post("/admin/createHwd", acr_hw)         // ok
+
 }

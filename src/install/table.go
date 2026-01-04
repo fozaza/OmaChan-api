@@ -7,6 +7,7 @@ import (
 
 func Install_table() {
 	db := database.Get_db()
-	table_all := []any{&table.User{}, &table.HardWare{}, &table.HardWareData{}}
-	db.AutoMigrate(table_all...)
+	//table_all := []any{&table.User{}, &table.HardWare{}, &table.HardWareData{}}
+	//db.AutoMigrate(table_all...)
+	db.AutoMigrate(&table.User{}, &table.HardWare{})
 }

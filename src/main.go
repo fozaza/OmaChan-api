@@ -17,9 +17,13 @@ func main() {
 	if err := database.Open(os.Getenv("db_path")); err != nil {
 		panic(err.Error())
 	}
+
 	install.Install_table()
 	install.Install_root()
-	jp2a.Print(os.Getenv("image"))
+	env := os.Getenv("OPEN_WITH_DOCKER")
+	if env != "" {
+		jp2a.Print(os.Getenv("image"))
+	}
 	println("Test")
 	server.OpenServer()
 }

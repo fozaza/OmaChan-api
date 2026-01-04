@@ -41,6 +41,13 @@ type UserReturn struct {
 	Level int
 }
 
+func (UserReturn) none() UserReturn {
+	return UserReturn{
+		Email: "",
+		Level: 0,
+	}
+}
+
 const userContextKey = "user"
 
 func ExtractUserFromJWT(app *fiber.App) fiber.Handler {
@@ -61,9 +68,27 @@ func ExtractUserFromJWT(app *fiber.App) fiber.Handler {
 }
 
 // Read token
-func Get_token(c *fiber.Ctx) (string, int) {
-	user := c.Locals(userContextKey).(*UserReturn)
-	return user.Email, user.Level
+func Get_token(c *fiber.Ctx) (UserReturn, error) {
+	userReturn := *new(UserReturn)
+	user, ok := c.Locals("user").(*jwt.Token)
+	if !ok || user == nil {
+		return userReturn, c.Status(fiber.StatusUnauthorized).
+			JSON(fiber.Map{"error": "OmaChan >>> you dont have jwt"})
+
+	}
+
+	claims := user.Claims.(jwt.MapClaims)
+	email, emailOk := claims["email"].(string)
+	level, levelOk := claims["level"].(float64)
+	if !levelOk || !emailOk {
+		return userReturn, c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"Error": "OmaChan >>> Invalid server"})
+	}
+
+	userReturn.Email = email
+	userReturn.Level = int(level)
+
+	return userReturn, nil
 }
 
 func Req_level(levelreq int) fiber.Handler {
@@ -77,7 +102,7 @@ func Req_level(levelreq int) fiber.Handler {
 
 		claims := user.Claims.(jwt.MapClaims)
 		_, emailOk := claims["email"].(string)
-		level, levelOk := claims["level"].(float64)
+		level, levelOk := claims["level"].(float64) // idk why me create level int but cannot map data to int. fucking magic
 		if !levelOk || !emailOk {
 			return c.Status(fiber.StatusInternalServerError).
 				JSON(fiber.Map{"Error": "OmaChan >>> Invalid server"})
@@ -93,13 +118,8 @@ func Req_level(levelreq int) fiber.Handler {
 
 func Con_jwt(app *fiber.App) any {
 	return app.Use(jwtware.New(jwtware.Config{
-		SigningKey: jwtware.SigningKey{Key: []byte(os.Getenv("key"))},
-		// est context key ex.. c.locals("jwt")
-		//ContextKey:   "jwt",
+		SigningKey:   jwtware.SigningKey{Key: []byte(os.Getenv("key"))},
 		ErrorHandler: error_jwt,
-		// SuccessHandler: func(c *fiber.Ctx) error {
-		// 	return c.Next()
-		// },
 	}))
 }
 
