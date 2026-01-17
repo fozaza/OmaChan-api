@@ -12,4 +12,4 @@ fix bug
 ---
 
 Document
-[Link doc] (docs/README.md)
+[Link doc](./docs/README.md)
