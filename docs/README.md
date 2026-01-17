@@ -24,17 +24,17 @@ cd OmaChan-api
 ``` yay -S docker-compose ```
 
 - debian base or ubuntu base
-``` sudo apt install docker-compose-plugin
+``` sudo apt install docker-compose-plugin ```
 
 
-4.build image
- ```docker build -t omachan-image -f ./Dockerfile . ```
+4.build image  ```docker build -t omachan-image -f ./Dockerfile . ```
 เพิ่มเติมสามารถ config file docker เพื่อเปลี่ยน password email(ใส่เป็น email อะไรก็ได้ยังไม่สามารถใช้งาน email)
 หา
 ```
  ENV EMAIL = "test@email.com"
  ENV PASSWORD = "12345678"
 ```
+
 
 เพิ่มเติมสามารถ config file docker-compose เพื่อเปลี่ยน password databaseName user
 ตรง environment  progres 
@@ -47,11 +47,11 @@ cd OmaChan-api
 6.run container
 ``` docker compose up -d ```
 
-วิิธีปิดการใช้งาน
+วิธีปิดการใช้งาน
 ``` docker compose down ```
 
 ในกรณีที่มีการ config file new เเละเคย run docker ตัองลบ volum เก่าทิ่งก่อน
 
-net step
+nxet step
 - [web]()
 - [esp32]()
