@@ -1,9 +1,9 @@
-### OmaChan-api project
-# * OmaChan-api project คือ api ไว้สำหรับเครื่องจับฝุ่น * 
+# OmaChan-api project
+## OmaChan-api project คือ api ไว้สำหรับเครื่องจับฝุ่น  
 
 ---
 
-new update
+### new update
 - Update document 
 
 fix bug
