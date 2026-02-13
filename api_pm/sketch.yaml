@@ -1,0 +1,2 @@
+default_fqbn: esp32:esp32:esp32        # เปลี่ยนตามบอร์ดคุณ
+default_port: /dev/ttyUSB0                 # หรือ /dev/ttyUSB0 บน Linux

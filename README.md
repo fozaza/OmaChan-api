@@ -6,7 +6,7 @@
 ### new update
 - Update document 
 
-fix bug
+hardware code
 - None
 
 ---
